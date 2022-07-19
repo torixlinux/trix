@@ -1,3 +1,5 @@
-project('trix', 'c')
+project('torixpkg', 'c')
+exec_name = get_option('program_name')
 subdir('src')
-executable('trix', sources)
+add_project_arguments('-DEXECNAME="' + exec_name + '"', language: 'c')
+executable(exec_name, sources)

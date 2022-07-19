@@ -3,7 +3,7 @@
 #include <unistd.h>
 
 static void usage() {
-	fprintf(stderr, "usage: trix [-hv]\n");
+	fprintf(stderr, "usage: %s [-hv]\n", EXECNAME);
 }
 
 int main(int argc, char** argv) {
