@@ -1,5 +1,6 @@
 project('torixpkg', 'c')
 exec_name = get_option('program_name')
 subdir('src')
+trixd_proj = subproject('trixd')
 add_project_arguments('-DEXECNAME="' + exec_name + '"', language: 'c')
 executable(exec_name, sources)
