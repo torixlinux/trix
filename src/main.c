@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <string.h>
-#include <stdboo.h>
+#include <stdbool.h>
 
 #include <sqlite3.h>
 
