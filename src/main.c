@@ -3,20 +3,35 @@
 #include <unistd.h>
 #include <string.h>
 #include <stdbool.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 
 #include <sqlite3.h>
 
 #include "ui.h"
 
-static const char* trix_global_home = "/var/trix/";
-static const char* trix_global_pkgdb = "/var/trix/pkg.db";
+#define TRIX_GLOBAL_HOME "/var/trix/"
 
 static void usage() {
 	fprintf(stderr, "usage: %s [action]\n", EXECNAME);
 }
 
 static void pkgdb_init(char* path) {
+	struct stat st = {0};
+	if (stat(path, &st) == -1) {
+		mkdir(path, 0700);
+	}
 
+	char packagedb[strlen(path) + strlen("/pkg.db")];
+	sprintf(packagedb, "%s/pkg.db", path);
+
+	sqlite3* db;
+	int rc = sqlite3_open(packagedb, &db);
+	if (rc) {
+		TRIX_ERR("Can't open package database for writing");
+	} else {
+
+	}
 }
 
 int main(int argc, char** argv) {
@@ -45,29 +60,24 @@ int main(int argc, char** argv) {
 		}
 	}
 
-	if (access(trix_global_pkgdb, F_OK) != 0) {
+	if (access(TRIX_GLOBAL_HOME, F_OK) != 0) {
 		char* usrhome = getenv("HOME");
 		if (usrhome != NULL) {
-			char trixhome[strlen(usrhome)];
-			strcpy(trixhome, usrhome);
-			strcat(trixhome, "/.trix/");
-			char* trixpkgdb = malloc(strlen(trixhome));
-			strcpy(trixpkgdb, trixhome);
-			strcat(trixpkgdb, "pkg.db");
-			if (access(trixpkgdb, F_OK) != 0) {
-				/* only create a global package database if running as root */
-				if (getuid() == 0) {
-					free(trixpkgdb);
-					trixpkgdb = trix_global_pkgdb;
-				}
-
+			char trixhome[strlen(usrhome) + strlen("/.trix/") + strlen("pkg.db")];
+			sprintf(trixhome, "%s/.trix", usrhome);
+			if (access(trixhome, F_OK) != 0) {
 				if (trix_ask("Coudn't find a writable package database, do you want to initialize one now?")) {
-					pkgdb_init(trixpkgdb);
+					/* only create a global package database if running as root */
+					if (getuid() == 0) {
+						pkgdb_init(TRIX_GLOBAL_HOME);
+					} else {
+						pkgdb_init(trixhome);
+					}
+				
 				} else {
 					puts("Aborting.");
 					return 1;
 				}
-
 			}
 		}
 	}
