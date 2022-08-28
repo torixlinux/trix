@@ -1,4 +1,10 @@
+#include <stdio.h>
+#include <string.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+
 #include "db.h"
+#include "ui.h"
 
 sqlite3* pkgdb_init(char* path) {
 	struct stat st = {0};

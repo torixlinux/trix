@@ -1,4 +1,5 @@
 sources = files([
 	'main.c',
-	'ui.c'
+	'ui.c',
+	'db.c'
 ])
